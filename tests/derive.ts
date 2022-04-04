@@ -25,8 +25,8 @@ describe("construction/derive", () => {
         const key = new MnemonicKey();
         const pubkey = key.publicKey! as SimplePublicKey;
         const hex_bytes = Buffer.from(pubkey.key, 'base64').toString('hex');
-        console.log(`pubkey.key: |${pubkey.key}|`);
-        console.log(`hex_bytes: |${hex_bytes}|${hex_bytes.length}|`)
+        //console.log(`pubkey.key: |${pubkey.key}|`);
+        //console.log(`hex_bytes: |${hex_bytes}|${hex_bytes.length}|`)
 
         param.public_key.hex_bytes = hex_bytes
 

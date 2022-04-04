@@ -55,7 +55,7 @@ describe("construction/payloads", () => {
         param.public_keys.push(public_key);
 
         const accountInfo = await client.auth.accountInfo(from.accAddress);
-        console.log(accountInfo);
+        //console.log(accountInfo);
         const signer_data = {
             account_number: accountInfo.getAccountNumber(),
             sequence: accountInfo.getSequenceNumber()

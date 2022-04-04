@@ -45,7 +45,8 @@ describe("construction/parse", () => {
             const body = JSON.parse(response.text);
             count++;
 
-            console.log(body);
+            //console.log(body);
+
 
             expect(body.operations.length).toBeGreaterThan(0) // have to have 1 or more operation(s)
             for (let i = 0; i < body.operations.length; i++) {
