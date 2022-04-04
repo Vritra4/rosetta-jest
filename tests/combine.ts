@@ -54,12 +54,7 @@ describe("construction/combine", () => {
         param.metadata.signer_data.push(signer_data)
 
         const to = new MnemonicKey();
-        //const amount = new Coin('uluna', Math.floor(Math.random() * 120400));
-        const amount = new Coin('uluna', 1);
-
-        const msg = new MsgSend(from.accAddress, to.accAddress, amount.toString());
-        const unsigned_tx = await client.tx.create([{ address: from.accAddress }], { msgs: [msg], fee: new Fee(200000, "2000uluna") })
-        param.unsigned_transaction = Buffer.from(unsigned_tx.toBytes()).toString('hex');
+        const amount = new Coin('uluna', Math.floor(Math.random() * 120400));
 
         const pubkey = from.publicKey! as SimplePublicKey;
         const hex_bytes = Buffer.from(pubkey.key, 'base64').toString('hex');
@@ -68,13 +63,17 @@ describe("construction/combine", () => {
             curve_type: "secp256k1"
         };
 
-        //const payload_hex_bytes = createTxHash(unsigned_tx, from.publicKey! as SimplePublicKey, signer_data.account_number, signer_data.sequence);
-        const payload_hex_bytes = await getPayloadsHexBytes(from, to, amount)
+        const msg = new MsgSend(from.accAddress, to.accAddress, amount.toString());
+        const unsigned_tx = await client.tx.create([{ address: from.accAddress }], { msgs: [msg], fee: new Fee(200000, "2000uluna") })
+
+        const payload = await getPayloadsHexBytes(from, to, amount)
+
+        param.unsigned_transaction = payload.tx
         const signed_tx = await from.signTx(unsigned_tx, {
             chainID: "columbus-5",
             sequence: accountInfo.getSequenceNumber(),
             accountNumber: accountInfo.getAccountNumber(),
-            signMode: SignMode.SIGN_MODE_LEGACY_AMINO_JSON,
+            signMode: SignMode.SIGN_MODE_DIRECT,
         });
 
         const signature_hex_bytes = Buffer.from(signed_tx.signatures[0], "base64").toString("hex");
@@ -83,7 +82,7 @@ describe("construction/combine", () => {
                 account_identifier: {
                     address: from.accAddress
                 },
-                hex_bytes: payload_hex_bytes,
+                hex_bytes: payload.hex,
                 signature_type: "ecdsa"
             },
             public_key,
@@ -92,34 +91,19 @@ describe("construction/combine", () => {
         }
         param.signatures.push(signature);
 
-        console.log(JSON.stringify(param));
+        //console.log(JSON.stringify(param));
         const response = await superagent.post(url).send(param);
         const body = JSON.parse(response.text);
-        console.log(body);
+        //console.log(body);
+
+        expect(body).toHaveProperty("signed_transaction")
+
+        // TODO: ADD MORE VALIDATIONS
+
     });
 });
 
-/*
-function createTxHash(tx: Tx, pubKey: SimplePublicKey, account_number: number, sequence: number): string {
-    const signDoc = new SignDoc(
-        "columbus-5", account_number, sequence,
-        tx.auth_info, tx.body
-    )
-    // backup for restore
-    const signerInfos = signDoc.auth_info.signer_infos;
-    signDoc.auth_info.signer_infos = [
-        new SignerInfo(
-            pubKey,
-            signDoc.sequence,
-            new ModeInfo(new ModeInfo.Single(SignMode.SIGN_MODE_DIRECT))
-        ),
-    ];
-
-    return Buffer.from(sha256(Buffer.from(signDoc.toBytes()))).toString('hex');
-}
-*/
-
-async function getPayloadsHexBytes(from: MnemonicKey, to: MnemonicKey, amount: Coin): Promise<string> {
+async function getPayloadsHexBytes(from: MnemonicKey, to: MnemonicKey, amount: Coin): Promise<{ tx: string, hex: string }> {
     let param = {
         ...common,
         operations: [] as any[],
@@ -170,6 +154,7 @@ async function getPayloadsHexBytes(from: MnemonicKey, to: MnemonicKey, amount: C
     param.operations.push(operation);
     const response = await superagent.post("http://54.177.167.213:8090/construction/payloads").send(param);
     const body = JSON.parse(response.text);
-    console.log(`HEX_BYTES: ${body.payloads[0].hex_bytes}`);
-    return body.payloads[0].hex_bytes
+    //console.log(`UNSIG_TX: ${body.unsigned_transaction}`);
+    //console.log(`HEX_BYTES: ${body.payloads[0].hex_bytes}`);
+    return { tx: body.unsigned_transaction, hex: body.payloads[0].hex_bytes }
 }

@@ -83,11 +83,17 @@ describe("construction/payloads", () => {
             }
             param.operations.push(operation);
         }
-        console.log(JSON.stringify(param));
+        //console.log(JSON.stringify(param));
         const response = await superagent.post(url).send(param);
         const body = JSON.parse(response.text);
-        console.log(body);
+        //console.log(body);
 
-        // FIXME
+        expect(body).toHaveProperty("unsigned_transaction");
+        for (let i = 0; i < opNum; i++) {
+            expect(body.payloads[i].address).toEqual(from.accAddress)
+            expect(body.payloads[i].account_identifier.address).toEqual(from.accAddress)
+        }
+
+        // TODO: ADD MORE VALIDATIONS
     });
 });
