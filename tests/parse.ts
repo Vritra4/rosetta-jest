@@ -86,7 +86,7 @@ describe("construction/parse", () => {
             for (const msg of tx.tx.body.messages) {
                 const data = msg.toData();
                 //console.log(`MSG TYPE: ${data['@type']}`);
-                // skip ths tx. it is due to problem of terra.js
+                // skip this tx. it is due to problem of terra.js
                 if (data['@type'] == "/ibc.core.client.v1.MsgUpdateClient")
                     toSkip = true;
                 break;
