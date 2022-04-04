@@ -4,7 +4,7 @@ import common from '../common.json';
 import { LCDClient, MnemonicKey, SimplePublicKey, hashToHex, sha256 } from '@terra-money/terra.js';
 import { textSpanContainsPosition } from 'typescript';
 
-const url = "http://54.177.167.213:8090/construction/hash";
+const url = "http://54.177.167.213:8080/construction/hash";
 
 const key = new MnemonicKey();
 const pubkey = (key.publicKey as SimplePublicKey).toData().key
@@ -43,6 +43,12 @@ describe("construction/hash", () => {
             const calculated = Buffer.from(sha256(tx.tx.toBytes())).toString('hex').toUpperCase();
             expect(body.transaction_identifier.hash).toEqual(calculated);
             count++;
+
+
+            if (count >= 100) {
+                console.log(`hash test is done ${count} times. skip rest...`)
+                break;
+            }
         }
         expect(count).toBeGreaterThan(0);
     });

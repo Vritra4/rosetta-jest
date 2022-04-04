@@ -3,7 +3,7 @@ import common from '../common.json';
 
 import { hashToHex, LCDClient, MnemonicKey, SimplePublicKey } from '@terra-money/terra.js';
 
-const url = "http://54.177.167.213:8090/construction/derive";
+const url = "http://54.177.167.213:8080/construction/derive";
 
 
 let param = {

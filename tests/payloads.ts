@@ -4,7 +4,7 @@ import common from '../common.json';
 import { LCDClient, MnemonicKey, SimplePublicKey, hashToHex, sha256, Msg, MsgSend, Coin } from '@terra-money/terra.js';
 import { isTypeParameterDeclaration, textSpanContainsPosition } from 'typescript';
 
-const url = "http://54.177.167.213:8090/construction/payloads";
+const url = "http://54.177.167.213:8080/construction/payloads";
 
 const LOCALTERRA_MNEMONICS = [
     'satisfy adjust timber high purchase tuition stool faith fine install that you unaware feed domain license impose boss human eager hat rent enjoy dawn',
@@ -19,6 +19,8 @@ const LOCALTERRA_MNEMONICS = [
     //'index light average senior silent limit usual local involve delay update rack cause inmate wall render magnet common feature laundry exact casual resource hundred',
     'prefer forget visit mistake mixture feel eyebrow autumn shop pair address airport diesel street pass vague innocent poem method awful require hurry unhappy shoulder',
 ];
+
+jest.setTimeout(30 * 1000);
 
 describe("construction/payloads", () => {
     it("common check", async () => {
@@ -42,7 +44,7 @@ describe("construction/payloads", () => {
         }
         const client = new LCDClient({ URL: "http://54.177.167.213:1317", chainID: "columbus-5" })
 
-        const opNum = Math.floor(Math.random() * 3) + 1; // 1~4 operations
+        const opNum = Math.floor(Math.random() * 1) + 1; // 1~2 operations
 
         const from_seed = LOCALTERRA_MNEMONICS[Math.floor(Math.random() * LOCALTERRA_MNEMONICS.length)];
         const from = new MnemonicKey({ mnemonic: from_seed });
@@ -90,8 +92,9 @@ describe("construction/payloads", () => {
 
         expect(body).toHaveProperty("unsigned_transaction");
         for (let i = 0; i < opNum; i++) {
-            expect(body.payloads[i].address).toEqual(from.accAddress)
-            expect(body.payloads[i].account_identifier.address).toEqual(from.accAddress)
+            //console.log(`payload idx:${i}`);
+            expect(body.payloads[i].address).toEqual(from.accAddress);
+            expect(body.payloads[i].account_identifier.address).toEqual(from.accAddress);
         }
 
         // TODO: ADD MORE VALIDATIONS

@@ -4,7 +4,7 @@ import common from '../common.json';
 import { LCDClient, MnemonicKey, SimplePublicKey, hashToHex, sha256, Msg, MsgSend, Coin } from '@terra-money/terra.js';
 import { collapseTextChangeRangesAcrossMultipleVersions, isTypeParameterDeclaration, textSpanContainsPosition } from 'typescript';
 
-const url = "http://54.177.167.213:8090/construction/preprocess";
+const url = "http://54.177.167.213:8080/construction/preprocess";
 
 const key = new MnemonicKey();
 const pubkey = (key.publicKey as SimplePublicKey).toData().key

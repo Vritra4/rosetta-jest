@@ -1,7 +1,7 @@
 import * as superagent from 'superagent';
 import common from '../common.json';
 
-const url = "http://54.177.167.213:8090/network/options"
+const url = "http://54.177.167.213:8080/network/options"
 
 
 describe("network/options", () => {
@@ -53,7 +53,7 @@ describe("network/options", () => {
         });
 
         expect(typeof allow.historical_balance_lookup).toEqual("boolean");
-        expect(allow.timestamp_start_index).toBe(4724001);
+        expect(allow.timestamp_start_index).toBeUndefined(); // offline nodes returns nothing
         expect(allow.call_methos).toBeUndefined();
         expect(allow.balance_exemptions).toBeNull();
         expect(allow.mempool_coins).toBeFalsy();

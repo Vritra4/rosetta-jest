@@ -1,7 +1,7 @@
 import * as superagent from 'superagent';
 import common from '../common.json';
 
-const url = "http://54.177.167.213:8090/network/list"
+const url = "http://54.177.167.213:8080/network/list"
 
 
 describe("network/list", () => {

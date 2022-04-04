@@ -4,7 +4,7 @@ import common from '../common.json';
 import { LCDClient, MnemonicKey, SimplePublicKey, hashToHex, sha256 } from '@terra-money/terra.js';
 import { isTypeParameterDeclaration, textSpanContainsPosition } from 'typescript';
 
-const url = "http://54.177.167.213:8090/construction/parse";
+const url = "http://54.177.167.213:8080/construction/parse";
 
 const key = new MnemonicKey();
 const pubkey = (key.publicKey as SimplePublicKey).toData().key
@@ -39,14 +39,15 @@ describe("construction/parse", () => {
         const txs = blockinfo.block.data.txs;
         let count = 0;      // if block has no tx, assume it to fail
         for (const tx of txs!) {
+            //if (count == 0)
+            //   console.log(`HEIGHT : ${blockinfo.block.header.height}`)
+
             param.transaction = Buffer.from(tx, 'base64').toString('hex');
 
             const response = await superagent.post(url).send(param);
             const body = JSON.parse(response.text);
-            count++;
-
             //console.log(body);
-
+            count++;
 
             expect(body.operations.length).toBeGreaterThan(0) // have to have 1 or more operation(s)
             for (let i = 0; i < body.operations.length; i++) {
@@ -59,6 +60,12 @@ describe("construction/parse", () => {
             }
 
             // TODO: ADD MORE VALIDATIONS
+
+
+            if (count >= 100) {
+                console.log(`parse test is done ${count} times. skip rest...`)
+                break;
+            }
         }
         expect(count).toBeGreaterThan(0);
     });
@@ -74,6 +81,17 @@ describe("construction/parse", () => {
         const txs = await client.tx.txInfosByHeight(undefined);
         let count = 0;
         for (const tx of txs) {
+            //console.log(`HEIGHT : ${tx.height} - HASH : ${tx.txhash}`)
+            let toSkip = false;
+            for (const msg of tx.tx.body.messages) {
+                const data = msg.toData();
+                //console.log(`MSG TYPE: ${data['@type']}`);
+                // skip ths tx. it is due to problem of terra.js
+                if (data['@type'] == "/ibc.core.client.v1.MsgUpdateClient")
+                    toSkip = true;
+                break;
+            }
+            if (toSkip) continue;
             tx.tx.clearSignatures();  // remove signatures to make them unsigned
             const txBytes = tx.tx.toBytes();
             const txHex = Buffer.from(txBytes).toString('hex');
@@ -92,6 +110,12 @@ describe("construction/parse", () => {
             }
 
             // TODO: ADD MORE VALIDATIONS
+
+
+            if (count >= 100) {
+                console.log(`parse test is done ${count} times. skip rest...`)
+                break;
+            }
         }
         expect(count).toBeGreaterThan(0);
     });

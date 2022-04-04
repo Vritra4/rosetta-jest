@@ -4,7 +4,7 @@ import { SignMode } from '@terra-money/terra.proto/cosmos/tx/signing/v1beta1/sig
 import { LCDClient, MnemonicKey, SimplePublicKey, hashToHex, sha256, ParamChanges, Coin, MsgSend, Fee, Tx, SignDoc, SignerInfo, ModeInfo } from '@terra-money/terra.js';
 import { isTypeParameterDeclaration, textSpanContainsPosition } from 'typescript';
 
-const url = "http://54.177.167.213:8090/construction/combine";
+const url = "http://54.177.167.213:8080/construction/combine";
 
 const LOCALTERRA_MNEMONICS = [
     'satisfy adjust timber high purchase tuition stool faith fine install that you unaware feed domain license impose boss human eager hat rent enjoy dawn',
@@ -152,7 +152,7 @@ async function getPayloadsHexBytes(from: MnemonicKey, to: MnemonicKey, amount: C
         }
     }
     param.operations.push(operation);
-    const response = await superagent.post("http://54.177.167.213:8090/construction/payloads").send(param);
+    const response = await superagent.post("http://54.177.167.213:8080/construction/payloads").send(param);
     const body = JSON.parse(response.text);
     //console.log(`UNSIG_TX: ${body.unsigned_transaction}`);
     //console.log(`HEX_BYTES: ${body.payloads[0].hex_bytes}`);
